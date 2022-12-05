@@ -64,32 +64,36 @@ const moveCratesOneByOne = (stacks, count, source, destination) => {
   }
 };
 
-const rearrangeStacks = (stacks, inputSectionTwo) => {
-  const lines = inputSectionTwo.split("\n");
-  for (let i = 0; i < lines.length; ++i) {
-    printStacks(stacks);
-    const line = lines[i];
-    if (line.length === 0) break;
-    const [ _, count, source, destination ] = line.match(/^move (\d+) from (\d+) to (\d+)$/);
-    console.log(`Moving ${count} crates from stack ${source} to stack ${destination}`);
-    console.log(`Source stack = ${stacks[source - 1].join("")}`);
-    console.log(`Destination stack = ${stacks[destination - 1].join("")}`);
-    moveCratesOneByOne(stacks, count, source, destination);
-    console.log(`Source stack after move = ${stacks[source - 1].join("")}`);
-    console.log(`Destination stack after move = ${stacks[destination - 1].join("")}`);
-  }
+const topCrates = (stacks) => {
   let topCrates = "";
   for (let i = 0; i < stacks.length; ++i) {
     topCrates += stacks[i][stacks[i].length - 1];
   }
-  printStacks(stacks);
-  console.log(topCrates);
+  return topCrates;
+};
+
+const rearrangeStacks = (inputSections) => {
+  const stacksPartOne = getStacks(inputSections[0]);
+  const stacksPartTwo = getStacks(inputSections[0]);
+  const instructions = inputSections[1].split("\n");
+  for (let i = 0; i < instructions.length; ++i) {
+    const instruction = instructions[i];
+    if (instruction.length === 0) break;
+    const [ _, count, source, destination ] = instruction.match(/^move (\d+) from (\d+) to (\d+)$/);
+    console.log(`Moving ${count} crates from stack ${source} to stack ${destination}`);
+    moveCratesOneByOne(stacksPartOne, count, source, destination);
+    moveCratesInStacks(stacksPartTwo, count, source, destination);
+  }
+  printStacks(stacksPartOne);
+  printStacks(stacksPartTwo);
+
+  console.log(topCrates(stacksPartOne));
+  console.log(topCrates(stacksPartTwo));
 };
 
 const solve = (err, data) => {
   const inputSections = data.toString().split("\n\n");
-  const stacks = getStacks(inputSections[0]);
-  rearrangeStacks(stacks, inputSections[1]);
+  rearrangeStacks(inputSections);
 };
 
 fs.readFile("day-05/input.txt", solve);
