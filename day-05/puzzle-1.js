@@ -19,13 +19,39 @@ const getStacks = (inputSectionOne) => {
         stacks[j].unshift(crate[1]);
       }
     }
-    console.log(stacks);
   }
+  console.log(stacks);
+  return stacks;
+};
+
+const rearrangeStacks = (stacks, inputSectionTwo) => {
+  const lines = inputSectionTwo.split("\n");
+  for (let i = 0; i < lines.length; ++i) {
+    const line = lines[i];
+    if (line.length === 0) break;
+    const [ _, count, source, destination ] = line.match(/^move (\d+) from (\d+) to (\d+)$/);
+    const moving = [];
+    console.log(`Moving ${count} crates from stack ${source} to stack ${destination}`);
+    console.log(`Source stack = ${stacks[source - 1].join("")}`);
+    console.log(`Destination stack = ${stacks[destination - 1].join("")}`);
+    for (let j = 0; j < parseInt(count, 10); ++j) {
+      moving.unshift(stacks[source - 1].pop());
+    }
+    stacks[destination - 1].push(...moving);
+    console.log(`Source stack after move = ${stacks[source - 1].join("")}`);
+    console.log(`Destination stack after move = ${stacks[destination - 1].join("")}`);
+  }
+  let topCrates = "";
+  for (let i = 0; i < stacks.length; ++i) {
+    topCrates += stacks[i][stacks[i].length - 1];
+  }
+  console.log(topCrates);
 };
 
 const solve = (err, data) => {
   const inputSections = data.toString().split("\n\n");
-  getStacks(inputSections[0]);
+  const stacks = getStacks(inputSections[0]);
+  rearrangeStacks(stacks, inputSections[1]);
 };
 
 fs.readFile("day-05/input.txt", solve);
