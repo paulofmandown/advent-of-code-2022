@@ -24,20 +24,57 @@ const getStacks = (inputSectionOne) => {
   return stacks;
 };
 
+const printStacks = (stacks) => {
+  let maxHeight = 0;
+  for (let i = 0; i < stacks.length; ++i) {
+    if (stacks[i].length > maxHeight) {
+      maxHeight = stacks[i].length;
+    }
+  }
+  for (let i = maxHeight - 1; i > -1; --i) {
+    let row = "";
+    for (let j = 0; j < stacks.length; ++j) {
+      if (stacks[j][i]) {
+        row += `[${stacks[j][i]}] `
+      } else {
+        row += "    ";
+      }
+    }
+    console.log(row);
+  }
+  let lastRow = "";
+  for (let i = 0; i < stacks.length; ++i) {
+    lastRow += ` ${i + 1}  `;
+  }
+  console.log(lastRow);
+};
+
+/* reading comprehension devil struck */
+const moveCratesInStacks = (stacks, count, source, destination) => {
+  const moving = [];
+  for (let j = 0; j < parseInt(count, 10); ++j) {
+    moving.unshift(stacks[source - 1].pop());
+  }
+  stacks[destination - 1].push(...moving);
+};
+
+const moveCratesOneByOne = (stacks, count, source, destination) => {
+  for (let i = 0; i < parseInt(count, 10); ++i) {
+    stacks[destination - 1].push(stacks[source - 1].pop());
+  }
+};
+
 const rearrangeStacks = (stacks, inputSectionTwo) => {
   const lines = inputSectionTwo.split("\n");
   for (let i = 0; i < lines.length; ++i) {
+    printStacks(stacks);
     const line = lines[i];
     if (line.length === 0) break;
     const [ _, count, source, destination ] = line.match(/^move (\d+) from (\d+) to (\d+)$/);
-    const moving = [];
     console.log(`Moving ${count} crates from stack ${source} to stack ${destination}`);
     console.log(`Source stack = ${stacks[source - 1].join("")}`);
     console.log(`Destination stack = ${stacks[destination - 1].join("")}`);
-    for (let j = 0; j < parseInt(count, 10); ++j) {
-      moving.unshift(stacks[source - 1].pop());
-    }
-    stacks[destination - 1].push(...moving);
+    moveCratesOneByOne(stacks, count, source, destination);
     console.log(`Source stack after move = ${stacks[source - 1].join("")}`);
     console.log(`Destination stack after move = ${stacks[destination - 1].join("")}`);
   }
@@ -45,6 +82,7 @@ const rearrangeStacks = (stacks, inputSectionTwo) => {
   for (let i = 0; i < stacks.length; ++i) {
     topCrates += stacks[i][stacks[i].length - 1];
   }
+  printStacks(stacks);
   console.log(topCrates);
 };
 
@@ -55,3 +93,4 @@ const solve = (err, data) => {
 };
 
 fs.readFile("day-05/input.txt", solve);
+// fs.readFile("day-05/example.txt", solve);
