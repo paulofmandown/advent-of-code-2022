@@ -7,7 +7,7 @@ const containsChar = (c, str) => {
   return false;
 };
 
-const isStartOfMessage = (str) => {
+const isStartOfSomething = (str) => {
   console.log(`Checking ${str}`);
   for (let i = 0; i < str.length - 1; ++i) {
     if (containsChar(str[i], str.substring(i + 1))) {
@@ -19,9 +19,14 @@ const isStartOfMessage = (str) => {
 
 const solve = (err, data) => {
   const dataStr = data.toString();
+  let foundSop = false;
   for (let i = 4; i < dataStr.length; ++i) {
-    if (isStartOfMessage(dataStr.substring(i - 4, i))) {
-      console.log(i + 1);
+    if (!foundSop && isStartOfSomething(dataStr.substring(i - 4, i))) {
+      console.log(`Start of packet = ${i}`);
+      foundSop = true;
+    }
+    if (i > 13 && isStartOfSomething(dataStr.substring(i - 14, i))) {
+      console.log(`Start of message = ${i}`);
       return;
     }
   }
