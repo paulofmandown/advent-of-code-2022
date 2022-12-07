@@ -1,7 +1,10 @@
 const fs = require("fs");
 
 const root = "/";
+const totalSize = 70_000_000;
+const freeSpaceNeeded = 30_000_000;
 let sumUnderAHundredK = 0;
+let smallestValidNode = null;
 
 const newFile = (name, parent) => {
   return {
@@ -29,19 +32,32 @@ const bumpSizes = (node, size) => {
   }
 };
 
-const getDirSizes = (node) => {
-  console.log(`${node.name} = ${node.size}`);
+const getFqName = (node) => {
+  let fqName = node.name;
+  let p = node.parent;
+  while (p) {
+    fqName = (p.name !== "/" ? p.name : "") + "/" + fqName;
+    p = p.parent;
+  }
+  return fqName;
+};
+
+const getDirSizes = (node, spaceNeededToFree) => {
   if (node.size <= 100_000) {
     sumUnderAHundredK += node.size;
   }
+  if (smallestValidNode === null || node.size > spaceNeededToFree && node.size < smallestValidNode.size) {
+    console.log(`Found a new smalled valid node ${node.name}`);
+    smallestValidNode = node;
+  }
   for (child in node.children) {
     if (node.children[child].children) {
-      getDirSizes(node.children[child]);
+      getDirSizes(node.children[child], spaceNeededToFree);
     }
   }
 }
 
-const solve = (err, data) => {
+const parseSessionOutput = (data) => {
   const lines = data.toString().split("\n");
   let current = directories[root];
   for (let i = 1; i < lines.length; ++i) {
@@ -77,8 +93,16 @@ const solve = (err, data) => {
       }
     }
   }
-  getDirSizes(directories[root]);
+}
+
+const solve = (err, data) => {
+  parseSessionOutput(data);
+  const spaceNeededToFree = freeSpaceNeeded - (totalSize - directories[root].size);
+  getDirSizes(directories[root], spaceNeededToFree);
+
+  console.log(`Need to free up ${spaceNeededToFree}`);
   console.log(`sumUnderAHundredK = ${sumUnderAHundredK}`);
+  console.log(`Can free up ${smallestValidNode.size}`);
 };
 
 fs.readFile("day-07/input.txt", solve);
