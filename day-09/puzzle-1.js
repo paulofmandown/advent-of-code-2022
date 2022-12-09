@@ -24,6 +24,26 @@ const getRope = (len) => {
   return node;
 };
 
+const moveNode = (node) => {
+  console.log(`checking node ${node} against parent ${node.parent}`);
+  const xDiff = node.x - node.parent.x;
+  const yDiff = node.y - node.parent.y;
+  if (xDiff > 1) {
+    node.x -= 1;
+    node.y = Math.abs(yDiff) === 1 ? node.parent.y : node.y;
+  } else if (xDiff < -1) {
+    node.x += 1;
+    node.y = Math.abs(yDiff) === 1 ? node.parent.y : node.y;
+  }
+  if (yDiff > 1) {
+    node.y -= 1;
+    node.x = Math.abs(xDiff) === 1 ? node.parent.x : node.x;
+  } else if (yDiff < -1) {
+    node.y += 1;
+    node.x = Math.abs(xDiff) === 1 ? node.parent.x : node.x;
+  }
+}
+
 const pullRope = (head, dir, len, tailPositions) => {
   for (let j = 0; j < len; ++j) {
     switch (dir) {
@@ -35,23 +55,7 @@ const pullRope = (head, dir, len, tailPositions) => {
     }
     let node = head.child;
     while (node) {
-      console.log(`checking node ${node} against parent ${node.parent}`);
-      const xDiff = node.x - node.parent.x;
-      const yDiff = node.y - node.parent.y;
-      if (xDiff > 1) {
-        node.x -= 1;
-        node.y = node.parent.y;
-      } else if (xDiff < -1) {
-        node.x += 1;
-        node.y = node.parent.y;
-      }
-      if (yDiff > 1) {
-        node.y -= 1;
-        node.x = node.parent.x;
-      } else if (yDiff < -1) {
-        node.y += 1;
-        node.x = node.parent.x;
-      }
+      moveNode(node);
       if (!node.child) {
         const pos = `${node.x},${node.y}`;
         console.log(`Tail visits ${pos}, ${tailPositions[pos] ? "an old" : "a new"} position`);
@@ -63,17 +67,22 @@ const pullRope = (head, dir, len, tailPositions) => {
 };
 
 const solve = (err, data) => {
-  const tailPositions = {};
-  const head = getRope(2);
+  const tailPositionsPartOne = {};
+  const headPartOne = getRope(2);
+  const tailPositionsPartTwo = {};
+  const headPartTwo = getRope(10);
   const lines = data.toString().split("\n");
   for (let i = 0; i < lines.length; ++i) {
     const line = lines[i];
     if (line.length === 0) continue;
     const [ dir, len] = line.split(" ");
-    pullRope(head, dir, len, tailPositions);
+    pullRope(headPartOne, dir, len, tailPositionsPartOne);
+    pullRope(headPartTwo, dir, len, tailPositionsPartTwo);
   }
-  console.log(`Tail visited ${Object.keys(tailPositions).length} position(s)`);
+  console.log(`Part one tail visited ${Object.keys(tailPositionsPartOne).length} position(s)`);
+  console.log(`Part two tail visited ${Object.keys(tailPositionsPartTwo).length} position(s)`);
 };
 
-// fs.readFile("day-09/input.txt", solve);
-fs.readFile("day-09/example.txt", solve);
+fs.readFile("day-09/input.txt", solve);
+// fs.readFile("day-09/example.txt", solve);
+// fs.readFile("day-09/example-2.txt", solve);
