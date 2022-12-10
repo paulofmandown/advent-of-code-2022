@@ -1,21 +1,37 @@
 const fs = require("fs");
 
+let pixels = [];
 let time = 0;
 let xValue = 1;
 let sum = 0;
 
 const tick = () => {
+  console.log(`Time ${time} %40 ${time % 40}. Sprite covers ${xValue - 1}, ${xValue}, and ${xValue + 1}`);
+  pixels[time] = 0;
+  for (let i = -1; i < 2; ++i) {
+    if (time % 40 === xValue + i) {
+      console.log(`Pixel ${time} is lit`);
+      pixels[time] = 1;
+      break;
+    }
+  }
   time +=1;
-  switch (time) {
-    case 20:
-    case 60:
-    case 100:
-    case 140:
-    case 180:
-    case 220:
-      const str = time * xValue;
-      console.log(`Strength = ${str} (${time} * ${xValue})`);
-      sum += str;
+  if ((time + 20) % 40 === 0) {
+    const str = time * xValue;
+    console.log(`Strength = ${str} (${time} * ${xValue})`);
+    sum += str;
+  }
+};
+
+const drawPixels = () => {
+  console.log(pixels);
+  for (let i = 0; pixels[i];) {
+    let line = "";
+    for (let j = 0; j < 40; ++j) {
+      line += pixels[i] === 1 ? "#" : ".";
+      i += 1;
+    }
+    console.log(line);
   }
 };
 
@@ -40,6 +56,7 @@ const solve = (err, data) => {
     }
   }
   console.log(`Sum = ${sum}`);
+  drawPixels();
 };
 
 fs.readFile("day-10/input.txt", solve);
